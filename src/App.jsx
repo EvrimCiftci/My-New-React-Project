@@ -1,0 +1,37 @@
+import { useState } from 'react'
+import Header from './components/Header'
+import GetStarted from './components/GetStarted'
+import OurServices from './components/OurServices'
+import FAQ from './components/FASQ'
+import Footer from './components/Footer'
+import BackToTopButton from './components/BackToToButton'
+import Copyright from './components/Copyright'
+import WhyChooseUs from './components/WhyChooseUs'
+import ScrollBarIndicator from './components/ScrollBarIndicator'
+
+function App() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <div className='selection:bg-purple-200 flex flex-wrap '>
+       <ScrollBarIndicator/>
+      <div className="absolute top-0 -z-10 h-full w-full bg-white"><div className="absolute bottom-auto left-auto right-0 top-0 h-[500px] w-[500px] -translate-x-[30%] translate-y-[20%] rounded-full bg-[rgba(173,109,244,0.5)] opacity-50 blur-[80px]"></div></div>
+      <div className="h-svh	bg-[url(./assets/City.png)] bg-no-repeat	bg-center	bg-cover	">
+      
+        <Header />
+      <GetStarted />
+      </div>
+     
+      <OurServices />
+      <WhyChooseUs/>
+      <FAQ/>
+      <Footer />
+      <Copyright/>
+      <BackToTopButton />
+     
+    
+    </div>
+  )
+}
+
+export default App
