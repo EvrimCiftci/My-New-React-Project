@@ -8,6 +8,10 @@ import BackToTopButton from './components/BackToToButton'
 import Copyright from './components/Copyright'
 import WhyChooseUs from './components/WhyChooseUs'
 import ScrollBarIndicator from './components/ScrollBarIndicator'
+import Testimonial from './components/Testimonial'
+import LiveSupportButton from './components/LiveSupportButton'
+import AboutUs from './components/AboutUs'
+import PricingComponent from './components/PricingComponent'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -21,15 +25,16 @@ function App() {
         <Header />
       <GetStarted />
       </div>
-     
       <OurServices />
-      <WhyChooseUs/>
-      <FAQ/>
+      <PricingComponent/>
+      <AboutUs/>
+      <WhyChooseUs />
+      <Testimonial/>
+      <FAQ />
       <Footer />
       <Copyright/>
       <BackToTopButton />
-     
-    
+      <LiveSupportButton/>
     </div>
   )
 }

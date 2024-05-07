@@ -8,7 +8,7 @@ const Footer = () => {
   return (
 <div className="w-screen flex flex-wrap items-center bg-gray-100 h-96">
   <div className="w-screen sm:w-1/2 flex justify-center items-center mb-6 sm:mb-0">
-    <div className="rounded-xl flex flex-wrap border border-black border-2 justify-center items-center w-80 bg-transparent">
+    <div className=" flex flex-wrap  border-b-black border-t-black border-b-2 border-t-2 justify-center items-center w-80 bg-transparent">
       <div className="h-3/12">
         <img className="h-24 w-24" src={img} alt="logo" />
       </div>
