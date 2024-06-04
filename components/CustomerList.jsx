@@ -1,13 +1,34 @@
 import { useState, useRef, useEffect } from 'react';
-import { FaEdit, FaTimes, FaInfo } from "react-icons/fa";
-import { FaTrash } from "react-icons/fa";
+import { FaEdit, FaTimes, FaInfo, FaTrash, FaArrowLeft, FaArrowRight, FaFilePdf, FaFileExcel, FaDownload } from "react-icons/fa";
 import emptyImage from "../assets/empty.png";
-import { FaArrowLeft, FaArrowRight, FaFilePdf, FaFileExcel } from 'react-icons/fa';
 import { jsPDF } from 'jspdf';
 import * as XLSX from 'xlsx';
 
 const CustomerList = ({ customers, onDeleteCustomer }) => {
-  // Function to export data to PDF
+  const [currentPage, setCurrentPage] = useState(1);
+  const [customersPerPage] = useState(13);
+  const [deleteConfirmation, setDeleteConfirmation] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [formData, setFormData] = useState(null);
+  const [dropdownIndex, setDropdownIndex] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown menu
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownIndex(null);
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const exportToPDF = () => {
     const doc = new jsPDF();
     doc.text(20, 20, 'Customer List');
@@ -19,7 +40,6 @@ const CustomerList = ({ customers, onDeleteCustomer }) => {
     doc.save('customer_list.pdf');
   };
 
-  // Function to export data to Excel
   const exportToExcel = () => {
     const data = [['Name', 'Email', 'Phone']];
     customers.forEach((customer) => {
@@ -31,55 +51,26 @@ const CustomerList = ({ customers, onDeleteCustomer }) => {
     XLSX.writeFile(wb, 'customer_list.xlsx');
   };
 
-  // State variables
-  const [currentPage, setCurrentPage] = useState(1); // Current page number for pagination
-  const [customersPerPage] = useState(13); // Number of customers per page
-  const [deleteConfirmation, setDeleteConfirmation] = useState(null); // Customer ID for delete confirmation
-  const [selectedCustomer, setSelectedCustomer] = useState(null); // Selected customer for details or edit mode
-  const [editMode, setEditMode] = useState(false); // Edit mode indicator
-  const [formData, setFormData] = useState(null); // Form data for editing
-  const [dropdownIndex, setDropdownIndex] = useState(null); // Index for dropdown menu
-  const dropdownRef = useRef(null); // Ref for dropdown menu
-
-  useEffect(() => {
-    // Handle click outside dropdown menu
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownIndex(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside); // Add event listener for click outside
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside); // Remove event listener on component unmount
-    };
-  }, []);
-
-  // Function to set delete confirmation
   const handleDeleteConfirmation = (id) => {
     setDeleteConfirmation(id);
   };
 
-  // Function to handle customer deletion
   const handleDeleteCustomer = (id) => {
-    onDeleteCustomer(id); // Call onDeleteCustomer function from props to delete customer
-    setDeleteConfirmation(null); // Close the confirmation dialog after deletion
+    onDeleteCustomer(id);
+    setDeleteConfirmation(null);
   };
 
-  // Function to show customer details
   const handleDetails = (customer) => {
-    setSelectedCustomer(customer); // Set selected customer
-    setEditMode(false); // Set edit mode to false
+    setSelectedCustomer(customer);
+    setEditMode(false);
   };
 
-  // Function to enter edit mode for a customer
   const handleEdit = (customer) => {
-    setSelectedCustomer(customer); // Set selected customer
-    setEditMode(true); // Set edit mode to true
-    setFormData({ ...customer }); // Initialize form data with customer data
+    setSelectedCustomer(customer);
+    setEditMode(true);
+    setFormData({ ...customer });
   };
 
-  // Function to handle form input change
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevFormData) => ({
@@ -88,67 +79,74 @@ const CustomerList = ({ customers, onDeleteCustomer }) => {
     }));
   };
 
-  // Function to handle form submission
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    // Validation can be added here before updating the customer
     if (!formData.Bname.trim() || !formData.email.trim() || !formData.number.trim()) {
-      // Handle validation errors, e.g., display error messages
       alert('Please fill in all required fields.');
       return;
     }
-    // Optional: Additional validation, such as email format validation
     const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
     if (!isValidEmail) {
       alert('Please enter a valid email address.');
       return;
     }
-    // Update the selected customer data
     const updatedCustomers = customers.map((customer) =>
       customer.id === selectedCustomer.id ? { ...customer, ...formData } : customer
     );
-    // Reset the selected customer and form data
     setSelectedCustomer(null);
     setEditMode(false);
     setFormData(null);
-    // Update the state with the updated customers
-    // setCustomers(updatedCustomers); // Make sure to update the state with the updated customers
   };
 
-  // Function to close details or edit mode
   const handleCloseDetails = () => {
-    setSelectedCustomer(null); // Reset selected customer
-    setEditMode(false); // Reset edit mode
-    setFormData(null); // Reset form data
+    setSelectedCustomer(null);
+    setEditMode(false);
+    setFormData(null);
   };
 
-  // Pagination
-  const indexOfLastCustomer = currentPage * customersPerPage; // Index of last customer on current page
-  const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage; // Index of first customer on current page
-  const currentCustomers = customers.slice(indexOfFirstCustomer, indexOfLastCustomer); // Current customers to display
-  const totalCustomers = customers.length; // Total number of customers
+  const indexOfLastCustomer = currentPage * customersPerPage;
+  const indexOfFirstCustomer = indexOfLastCustomer - customersPerPage;
+  const currentCustomers = customers.slice(indexOfFirstCustomer, indexOfLastCustomer);
+  const totalCustomers = customers.length;
 
-  // Function to change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  return (
-    <div className="w-full h-full  flex  flex flex-col justify-center items-center">
-            <button onClick={exportToPDF}><FaFilePdf /> Export to PDF</button>
-           <button onClick={exportToExcel}><FaFileExcel /> Export to Excel</button>
-      {/* Your existing component code goes here */}
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
 
-      {customers.length === 0 ? ( // Render empty list message if no customers
+  return (
+    <div className="w-full h-full flex flex-col justify-center items-center">
+      <div className="relative mb-4 flex justify-start w-full">
+        <button onClick={toggleDropdown} className="flex items-center space-x-2 bg-gray-200 px-4 py-2 rounded-md shadow-md ml-5">
+          <FaDownload />
+          <span>Download</span>
+        </button>
+        {isDropdownOpen && (
+          <div ref={dropdownRef} className="absolute mt-11 ml-1 bg-white border border-gray-200 rounded-md shadow-lg left-0 ">
+            <button onClick={exportToPDF} className="flex items-center px-4 py-2 w-full hover:bg-gray-100">
+              <FaFilePdf className="mr-2" />
+              Export to PDF
+            </button>
+            <button onClick={exportToExcel} className="flex items-center px-4 py-2 w-full hover:bg-gray-100">
+              <FaFileExcel className="mr-2" />
+              Export to Excel
+            </button>
+          </div>
+        )}
+      </div>  
+      {customers.length === 0 ? (
         <div className="relative w-full h-full flex justify-center items-center">
           <img src={emptyImage} alt="Empty List" className="inset-0 mb-52 object-cover w-52 h-52" />
-          <div className="absolute inset-0 flex justify-center items-center ">
+          <div className="absolute inset-0 flex justify-center items-center">
             <p className="text-gray-500 font-bold text-2xl bg-purple-100 p-2 rounded-xl">There are no registered customers in the list</p>
           </div>
         </div>
-      ) : ( 
+      ) : (
         <table className="overflow-hidden h-full block table-auto border-collapse shadow-md rounded-xl whitespace-nowrap w-full overflow-x-auto m-auto">
           <thead>
-            <tr className=' text-lg text-purple-600'>
-              <th >Customer Name</th>
+            <tr className='text-lg text-purple-600'>
+              <th>Customer Name</th>
               <th>Email</th>
               <th>Phone Number</th>
               <th>Address</th>
@@ -158,20 +156,20 @@ const CustomerList = ({ customers, onDeleteCustomer }) => {
           <tbody>
             {currentCustomers.map((customer, index) => (
               <tr key={customer.id} className='text-center'>
-                <td className="p-3 overflow-hidden border-t-2 border-t-gray-200 w-3/12 font-extrabold	 ">{customer.Bname}</td>
+                <td className="p-3 overflow-hidden border-t-2 border-t-gray-200 w-3/12 font-extrabold">{customer.Bname}</td>
                 <td className='w-3/12 p-3 overflow-hidden border-t-2 border-t-gray-200'>{customer.email}</td>
                 <td className='w-3/12 p-3 overflow-hidden border-t-2 border-t-gray-200'>{customer.number}</td>
                 <td className='w-3/12 p-3 overflow-hidden border-t-2 border-t-gray-200'>{customer.address}</td>
                 <td>
                   <div className="relative">
                     <button className="mt-2 ml-2" onClick={() => handleEdit(customer)}>
-                      <FaEdit className="w-8 h-8 text-purple-500  hover:text-purple-600" />
+                      <FaEdit className="w-8 h-8 text-purple-500 hover:text-purple-600" />
                     </button>
                     <button className="mt-2 ml-2" onClick={() => handleDetails(customer)}>
-                      <FaInfo className="w-8 h-8 text-purple-500  hover:text-purple-600" />
+                      <FaInfo className="w-8 h-8 text-purple-500 hover:text-purple-600" />
                     </button>
                     <button className="mt-2 ml-2" onClick={() => handleDeleteConfirmation(customer.id)}>
-                      <FaTrash className="w-8 h-8 text-purple-500 hover:text-purple-600"/>
+                      <FaTrash className="w-8 h-8 text-purple-500 hover:text-purple-600" />
                     </button>
                   </div>
                 </td>
@@ -194,7 +192,7 @@ const CustomerList = ({ customers, onDeleteCustomer }) => {
       {selectedCustomer && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white ml-36 p-8 rounded-md shadow-lg relative">
-            {!editMode ? ( // Render customer details if not in edit mode
+            {!editMode ? (
               <>
                 <h2 className="text-2xl font-semibold mb-4">Customer Details</h2>
                 <div>
@@ -204,7 +202,7 @@ const CustomerList = ({ customers, onDeleteCustomer }) => {
                   <p><strong>Address:</strong> {selectedCustomer.address}</p>
                 </div>
               </>
-            ) : ( // Render edit form if in edit mode
+            ) : (
               <form onSubmit={handleFormSubmit}>
                 <div className="flex flex-col mb-6">
                   <label htmlFor="Bname" className="mb-1">Business Name</label>
@@ -238,16 +236,14 @@ const CustomerList = ({ customers, onDeleteCustomer }) => {
           className="mr-2 px-4 py-2 bg-transparent text-gray-800 rounded-md hover:bg-purple-100 mb-2"
         >
           <FaArrowLeft />
-
         </button>
         <div>Page {currentPage}</div>
         <button
           onClick={() => setCurrentPage(currentPage + 1)}
           disabled={indexOfLastCustomer >= totalCustomers}
-          className="ml-2 px-4 py-2  bg-transparent text-gray-800 rounded-md hover:bg-purple-100 mb-2"
+          className="ml-2 px-4 py-2 bg-transparent text-gray-800 rounded-md hover:bg-purple-100 mb-2"
         >
           <FaArrowRight />
-
         </button>
       </div>
     </div>

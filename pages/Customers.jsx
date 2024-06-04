@@ -24,7 +24,7 @@ const Customers = () => {
       <SideBar />
       <div className="flex flex-col w-full h-full items-center justify-center">
         <div className='w-full flex justify-end items-end mr-12 mb-2'>
-          <button className='border-2 mt-14 border-purple-600 w-52 h-14 rounded-xl hover:bg-purple-600 hover:border-purple-300 hover:text-purple-300' onClick={() => setBoxOpen(true)}>
+          <button className='flex mt-5 items-center space-x-2 bg-gray-200 px-4 py-2 rounded-md shadow-md' onClick={() => setBoxOpen(true)}>
             Add New Customer
            </button>
         </div>

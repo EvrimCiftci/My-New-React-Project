@@ -14,7 +14,7 @@ const SideBar = () => {
     { title: "Invoice", src: <FaFileInvoiceDollar />, href: "/invoice" },
     { title: "Offer", src: <MdHandshake />, href: "/offer" },
     { title: "Customer management", src: <IoPeopleSharp />, href: "/Customers" },
-    { title: "Schedule", src: <RiCalendarScheduleFill />, href: "/schedule" },
+    { title: "Schedule", src: <RiCalendarScheduleFill />, href: "/Schedule" },
     { title: "Setting", src: <IoIosSettings />, gap: true },  
   ];
 
@@ -24,7 +24,7 @@ const SideBar = () => {
   };
 
   return (
-    <div className={`${open ? 'w-72' : 'w-20'} duration-300 h-screen p-5 pt-8 bg-purple-600 relative `}>
+    <div className={`${open ? 'w-72' : 'w-20'} duration-300 h-full p-5 pt-8 bg-purple-600 relative `}>
       <FaAngleLeft className={`absolute cursor-pointer
         -right-3 top-9 w-7 h-7 
           bg-white border-2 border-purple-600 rounded-full
